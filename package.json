@@ -1,0 +1,14 @@
+{
+  "name": "action-creator-creator",
+  "version": "0.1.0",
+  "description": "Generate Action Creator implementation files using TypeScript Compiler API",
+  "main": "index.js",
+  "repository": "git@github.com:0918nobita/action-creator-creator.git",
+  "author": "0918nobita <nobita.0918@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "devDependencies": {
+    "ts-node": "^9.1.1",
+    "typescript": "^4.1.3"
+  }
+}
