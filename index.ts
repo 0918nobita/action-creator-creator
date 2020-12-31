@@ -1,3 +1,4 @@
+import * as fs from 'fs';
 import * as ts from 'typescript';
 
 const program = ts.createProgram(['example/actions.ts'], {});
@@ -35,15 +36,30 @@ ts.forEachChild(source, (node) => {
   }
 });
 
+const exprStmt = ts.factory.createExpressionStatement(
+  ts.factory.createCallExpression(
+    ts.factory.createPropertyAccessExpression(
+      ts.factory.createIdentifier('console'),
+      'log'
+    ),
+    /* typeArguments */ [],
+    /* arguments */ [
+      ts.factory.createStringLiteral(
+        'Hello, world!',
+        /* isSingleQuote */ true
+      ),
+    ]
+  ));
+
 const funcDecl = ts.factory.createFunctionDeclaration(
   /* decorators */ undefined,
   /* modifiers */ [ts.factory.createToken(ts.SyntaxKind.ExportKeyword)],
   /* asteriskToken */ undefined,
-  /* name */ 'foo',
+  /* name */ 'example',
   /* typeParameters */ undefined,
   /* parameters */ [],
   /* returnType */ ts.factory.createKeywordTypeNode(ts.SyntaxKind.VoidKeyword),
-  ts.factory.createBlock([], /* multiline */ true)
+  ts.factory.createBlock([exprStmt], /* multiline */ true)
 );
 
 const outFile = ts.createSourceFile(
@@ -55,4 +71,4 @@ const outFile = ts.createSourceFile(
 );
 const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed });
 const result = printer.printNode(ts.EmitHint.Unspecified, funcDecl, outFile);
-console.log(result);
+fs.writeFileSync('out.ts', result + '\n');
