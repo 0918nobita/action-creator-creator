@@ -40,12 +40,16 @@ const tryGetActionTypeDef = (node: ts.InterfaceDeclaration): ActionTypeDefinitio
   return type && { name: res[1]!, type, payload };
 };
 
+const actionTypeDefs: ActionTypeDefinition[] = []
+
 ts.forEachChild(source, (node) => {
   if (ts.isInterfaceDeclaration(node)) {
     const actionTypeDef = tryGetActionTypeDef(node);
-    console.log(actionTypeDef?.type);
+    if (actionTypeDef) actionTypeDefs.push(actionTypeDef);
   }
 });
+
+console.log({ actionTypeDefs });
 
 const exprStmt = ts.factory.createExpressionStatement(
   ts.factory.createCallExpression(
