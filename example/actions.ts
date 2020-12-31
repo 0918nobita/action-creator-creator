@@ -1,6 +1,5 @@
 // @actions
 
-// @action
 interface ExampleAction {
   type: 'example';
   payload: {
