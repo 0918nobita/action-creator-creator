@@ -45,7 +45,7 @@ const tryGetActionTypeDef = (node: ts.InterfaceDeclaration): ActionTypeDefinitio
 ts.forEachChild(source, (node) => {
   if (ts.isInterfaceDeclaration(node)) {
     const actionTypeDef = tryGetActionTypeDef(node);
-    console.log(actionTypeDef);
+    console.log(actionTypeDef?.type);
   }
 });
 
