@@ -18,28 +18,26 @@ const tryGetActionTypeDef = (node: ts.InterfaceDeclaration): ActionTypeDefinitio
   let type: string | null = null;
   let payload: ts.Type | null = null;
 
-  if (res && res.length !== 0) {
-    node.members.forEach((member) => {
-      const t = typeChecker.getTypeAtLocation(member);
+  if (!res || res.length === 0) return null;
 
-      if (!member.name) return;
-      if (!ts.isIdentifier(member.name)) return;
-      const text = member.name.getText();
+  node.members.forEach((member) => {
+    const t = typeChecker.getTypeAtLocation(member);
 
-      if (text === 'type' && t.isStringLiteral()) {
-        type = t.value;
-        return;
-      }
+    if (!member.name) return;
+    if (!ts.isIdentifier(member.name)) return;
+    const text = member.name.getText();
 
-      if (text === 'payload') {
-        payload = t;
-      }
-    });
+    if (text === 'type' && t.isStringLiteral()) {
+      type = t.value;
+      return;
+    }
 
-    return type && { name: res[1]!, type, payload };
-  }
+    if (text === 'payload') {
+      payload = t;
+    }
+  });
 
-  return null;
+  return type && { name: res[1]!, type, payload };
 };
 
 ts.forEachChild(source, (node) => {
