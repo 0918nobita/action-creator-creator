@@ -34,3 +34,25 @@ ts.forEachChild(source, (node) => {
     console.log(actionTypeDef);
   }
 });
+
+const funcDecl = ts.factory.createFunctionDeclaration(
+  /* decorators */ undefined,
+  /* modifiers */ [ts.factory.createToken(ts.SyntaxKind.ExportKeyword)],
+  /* asteriskToken */ undefined,
+  /* name */ 'foo',
+  /* typeParameters */ undefined,
+  /* parameters */ [],
+  /* returnType */ ts.factory.createKeywordTypeNode(ts.SyntaxKind.VoidKeyword),
+  ts.factory.createBlock([], /* multiline */ true)
+);
+
+const outFile = ts.createSourceFile(
+  'out.ts',
+  /* sourceText */ '',
+  ts.ScriptTarget.Latest,
+  /* setParentNodes */ false,
+  ts.ScriptKind.TS
+);
+const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed });
+const result = printer.printNode(ts.EmitHint.Unspecified, funcDecl, outFile);
+console.log(result);
