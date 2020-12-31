@@ -20,24 +20,25 @@ const tryGetActionTypeDef = (node: ts.InterfaceDeclaration): ActionTypeDefinitio
 
   if (!res || res.length === 0) return null;
 
-  node.members.forEach((member) => {
+  for (const member of node.members) {
     const t = typeChecker.getTypeAtLocation(member);
 
-    if (!member.name) return;
-    if (!ts.isIdentifier(member.name)) return;
+    if (!member.name) continue;
+    if (!ts.isIdentifier(member.name)) continue;
     const text = member.name.getText();
 
     if (text === 'type' && t.isStringLiteral()) {
       type = t.value;
-      return;
+      continue;
     }
 
     if (text === 'payload') {
       payload = t;
     }
-  });
+  }
 
-  return type && { name: res[1]!, type, payload };
+  if (!type) return null;
+  return { name: res[1]!, type, payload };
 };
 
 const actionTypeDefs: ActionTypeDefinition[] = []
@@ -49,41 +50,48 @@ ts.forEachChild(source, (node) => {
   }
 });
 
-console.log({ actionTypeDefs });
+const funcDecls: ts.FunctionDeclaration[] = [];
 
-const exprStmt = ts.factory.createExpressionStatement(
-  ts.factory.createCallExpression(
-    ts.factory.createPropertyAccessExpression(
-      ts.factory.createIdentifier('console'),
-      'log'
-    ),
-    /* typeArguments */ [],
-    /* arguments */ [
-      ts.factory.createStringLiteral(
-        'Hello, world!',
-        /* isSingleQuote */ true
+for (const actionTypeDef of actionTypeDefs) {
+  const exprStmt = ts.factory.createExpressionStatement(
+    ts.factory.createCallExpression(
+      ts.factory.createPropertyAccessExpression(
+        ts.factory.createIdentifier('console'),
+        'log'
       ),
-    ]
-  ));
+      /* typeArguments */ [],
+      /* arguments */ [
+        ts.factory.createStringLiteral(
+          'Hello, world!',
+          /* isSingleQuote */ true
+        ),
+      ]
+    ));
 
-const funcDecl = ts.factory.createFunctionDeclaration(
-  /* decorators */ undefined,
-  /* modifiers */ [ts.factory.createToken(ts.SyntaxKind.ExportKeyword)],
-  /* asteriskToken */ undefined,
-  /* name */ 'example',
-  /* typeParameters */ undefined,
-  /* parameters */ [],
-  /* returnType */ ts.factory.createKeywordTypeNode(ts.SyntaxKind.VoidKeyword),
-  ts.factory.createBlock([exprStmt], /* multiline */ true)
-);
+  const toLowerCamelCase = (str: string): string => str.charAt(0).toLowerCase() + str.slice(1);
+
+  const funcDecl = ts.factory.createFunctionDeclaration(
+    /* decorators */ undefined,
+    /* modifiers */ [ts.factory.createToken(ts.SyntaxKind.ExportKeyword)],
+    /* asteriskToken */ undefined,
+    /* name */ toLowerCamelCase(actionTypeDef.name),
+    /* typeParameters */ undefined,
+    /* parameters */ [],
+    /* returnType */ ts.factory.createKeywordTypeNode(ts.SyntaxKind.VoidKeyword),
+    ts.factory.createBlock([exprStmt], /* multiline */ true)
+  );
+
+  funcDecls.push(funcDecl);
+}
 
 const outFile = ts.createSourceFile(
-  'out.ts',
-  /* sourceText */ '',
+   'out.ts',
+   /* sourceText */ '',
   ts.ScriptTarget.Latest,
   /* setParentNodes */ false,
   ts.ScriptKind.TS
 );
 const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed });
-const result = printer.printNode(ts.EmitHint.Unspecified, funcDecl, outFile);
-fs.writeFileSync('out.ts', result + '\n');
+const nodeArray = ts.factory.createNodeArray(funcDecls);
+const result = printer.printList(ts.ListFormat.MultiLine, nodeArray, outFile);
+fs.writeFileSync('out.ts', result);
