@@ -7,23 +7,36 @@ const typeChecker = program.getTypeChecker();
 
 interface ActionTypeDefinition {
   name: string;
+  type: string;
+  payload: ts.Type | null;
 }
 
 const tryGetActionTypeDef = (node: ts.InterfaceDeclaration): ActionTypeDefinition | null => {
   const name = node.name.getText();
   const res = name.match(/(.*)Action$/);
 
+  let type: string | null = null;
+  let payload: ts.Type | null = null;
+
   if (res && res.length !== 0) {
     node.members.forEach((member) => {
       const t = typeChecker.getTypeAtLocation(member);
 
-      if (member.name && ts.isIdentifier(member.name)) {
-        console.log(member.name.getText());
-        console.log(typeChecker.typeToString(t));
+      if (!member.name) return;
+      if (!ts.isIdentifier(member.name)) return;
+      const text = member.name.getText();
+
+      if (text === 'type' && t.isStringLiteral()) {
+        type = t.value;
+        return;
+      }
+
+      if (text === 'payload') {
+        payload = t;
       }
     });
 
-    return { name: res[1]! };
+    return type && { name: res[1]!, type, payload };
   }
 
   return null;
