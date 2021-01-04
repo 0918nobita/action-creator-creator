@@ -1,13 +1,13 @@
 // @actions
 
-interface FooAction {
+export interface FooAction {
   type: 'foo';
   payload: {
     num: number;
   };
 }
 
-interface BarAction {
+export interface BarAction {
   type: 'bar';
   payload: {
     str: string;

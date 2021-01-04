@@ -84,6 +84,27 @@ for (const actionTypeDef of actionTypeDefs) {
   funcDecls.push(funcDecl);
 }
 
+const importDecl = ts.factory.createImportDeclaration(
+  /* decorators */ undefined,
+  /* modifiers */ undefined,
+  ts.factory.createImportClause(
+    /* isTypeOnly */ true,
+    /* name */ undefined,
+    /* namedBindings */ ts.factory.createNamedImports([
+      ts.factory.createImportSpecifier(
+        /* propertyName */ undefined,
+        /* name */ ts.factory.createIdentifier('FooAction')
+      ),
+      ts.factory.createImportSpecifier(
+        /* propertyName */ undefined,
+        /* name */ ts.factory.createIdentifier('BarAction')
+      ),
+    ])
+  ),
+  ts.factory.createStringLiteral('./example/actions')
+);
+const nodeArray = ts.factory.createNodeArray([importDecl, ...funcDecls]);
+
 const outFile = ts.createSourceFile(
    'out.ts',
    /* sourceText */ '',
@@ -92,6 +113,5 @@ const outFile = ts.createSourceFile(
   ts.ScriptKind.TS
 );
 const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed });
-const nodeArray = ts.factory.createNodeArray(funcDecls);
 const result = printer.printList(ts.ListFormat.MultiLine, nodeArray, outFile);
 fs.writeFileSync('out.ts', result);
