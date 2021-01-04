@@ -8,7 +8,7 @@ const typeChecker = program.getTypeChecker();
 interface ActionTypeDefinition {
   name: string;
   type: string;
-  payload: ts.Type | null;
+  hasPayload: boolean;
 }
 
 const tryGetActionTypeDef = (node: ts.InterfaceDeclaration): ActionTypeDefinition | null => {
@@ -16,7 +16,7 @@ const tryGetActionTypeDef = (node: ts.InterfaceDeclaration): ActionTypeDefinitio
   const res = name.match(/(.*)Action$/);
 
   let type: string | null = null;
-  let payload: ts.Type | null = null;
+  let hasPayload = false;
 
   if (!res || res.length === 0) return null;
 
@@ -33,12 +33,12 @@ const tryGetActionTypeDef = (node: ts.InterfaceDeclaration): ActionTypeDefinitio
     }
 
     if (text === 'payload') {
-      payload = t;
+      hasPayload = true;
     }
   }
 
   if (!type) return null;
-  return { name: res[1]!, type, payload };
+  return { name: res[1]!, type, hasPayload };
 };
 
 const actionTypeDefs: ActionTypeDefinition[] = []
@@ -50,23 +50,33 @@ ts.forEachChild(source, (node) => {
   }
 });
 
+const importElements: ts.ImportSpecifier[] = [];
 const funcDecls: ts.FunctionDeclaration[] = [];
 
 for (const actionTypeDef of actionTypeDefs) {
-  const exprStmt = ts.factory.createExpressionStatement(
-    ts.factory.createCallExpression(
-      ts.factory.createPropertyAccessExpression(
-        ts.factory.createIdentifier('console'),
-        'log'
-      ),
-      /* typeArguments */ [],
-      /* arguments */ [
-        ts.factory.createStringLiteral(
-          'Hello, world!',
-          /* isSingleQuote */ true
-        ),
-      ]
-    ));
+  const actionTypeIdent = ts.factory.createIdentifier(`${actionTypeDef.name}Action`);
+
+  importElements.push(ts.factory.createImportSpecifier(
+    /* propertyName */ undefined,
+    /* name */ actionTypeIdent
+  ));
+
+  const properties: ts.ObjectLiteralElementLike[] = [
+    ts.factory.createPropertyAssignment(
+      ts.factory.createIdentifier('type'),
+      ts.factory.createStringLiteral(actionTypeDef.type)
+    ),
+  ];
+  if (actionTypeDef.hasPayload) {
+    properties.push(
+      ts.factory.createShorthandPropertyAssignment(
+        ts.factory.createIdentifier('payload')
+      )
+    );
+  }
+  const retStmt = ts.factory.createReturnStatement(
+    ts.factory.createObjectLiteralExpression(properties)
+  );
 
   const toLowerCamelCase = (str: string): string => str.charAt(0).toLowerCase() + str.slice(1);
 
@@ -76,9 +86,24 @@ for (const actionTypeDef of actionTypeDefs) {
     /* asteriskToken */ undefined,
     /* name */ toLowerCamelCase(actionTypeDef.name),
     /* typeParameters */ undefined,
-    /* parameters */ [],
-    /* returnType */ ts.factory.createKeywordTypeNode(ts.SyntaxKind.VoidKeyword),
-    ts.factory.createBlock([exprStmt], /* multiline */ true)
+    /* parameters */
+      actionTypeDef.hasPayload ?
+        [
+          ts.factory.createParameterDeclaration(
+            /* decorators */ undefined,
+            /* modifiers */ undefined,
+            /* dotDotDotToken */ undefined,
+            ts.factory.createIdentifier('payload'),
+            /* questionToken */ undefined,
+            ts.factory.createIndexedAccessTypeNode(
+              ts.factory.createTypeReferenceNode(actionTypeIdent),
+              ts.factory.createLiteralTypeNode(ts.factory.createStringLiteral('payload'))
+            )
+          ),
+        ]
+        : [],
+    /* returnType */ ts.factory.createTypeReferenceNode(actionTypeIdent),
+    ts.factory.createBlock([retStmt], /* multiline */ true)
   );
 
   funcDecls.push(funcDecl);
@@ -90,16 +115,7 @@ const importDecl = ts.factory.createImportDeclaration(
   ts.factory.createImportClause(
     /* isTypeOnly */ true,
     /* name */ undefined,
-    /* namedBindings */ ts.factory.createNamedImports([
-      ts.factory.createImportSpecifier(
-        /* propertyName */ undefined,
-        /* name */ ts.factory.createIdentifier('FooAction')
-      ),
-      ts.factory.createImportSpecifier(
-        /* propertyName */ undefined,
-        /* name */ ts.factory.createIdentifier('BarAction')
-      ),
-    ])
+    /* namedBindings */ ts.factory.createNamedImports(importElements)
   ),
   ts.factory.createStringLiteral('./example/actions')
 );

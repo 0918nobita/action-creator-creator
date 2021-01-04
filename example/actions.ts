@@ -1,5 +1,3 @@
-// @actions
-
 export interface FooAction {
   type: 'foo';
   payload: {
@@ -12,4 +10,8 @@ export interface BarAction {
   payload: {
     str: string;
   };
+}
+
+export interface BazAction {
+  type: 'baz';
 }
