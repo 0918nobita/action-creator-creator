@@ -1,0 +1,22 @@
+{
+  "name": "@redux-acc/webpack-plugin",
+  "version": "0.1.0",
+  "description": "Webpack plugin",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "repository": "git@github.com:0918nobita/action-creator-creator.git",
+  "author": "0918nobita <nobita.0918@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@redux-acc/core": "0.1.0",
+    "webpack": "^5.11.1"
+  },
+  "devDependencies": {
+    "@types/node": "^14.14.17",
+    "typescript": "^4.1.3"
+  }
+}

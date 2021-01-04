@@ -1,0 +1,20 @@
+{
+  "name": "@redux-acc/webpack-plugin-example",
+  "version": "0.1.0",
+  "repository": "git@github.com:0918nobita/action-creator-creator.git",
+  "author": "0918nobita <nobita.0918@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "build": "webpack"
+  },
+  "devDependencies": {
+    "@redux-acc/webpack-plugin": "0.1.0",
+    "@types/node": "^14.14.17",
+    "ts-loader": "^8.0.13",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.1.3",
+    "webpack": "^5.11.1",
+    "webpack-cli": "^4.3.1"
+  }
+}

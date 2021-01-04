@@ -1,8 +1,7 @@
 #!/usr/bin/env node
 
+import { bootstrap } from '@redux-acc/core';
 import chalk from 'chalk';
-
-import { bootstrap } from './lib';
 
 const args = process.argv.splice(2);
 
