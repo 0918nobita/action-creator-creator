@@ -8,47 +8,52 @@ interface ActionTypeDefinition {
   hasPayload: boolean;
 }
 
+/**
+ * interface 宣言をもとに ActionTypeDef を取得する。
+ * Action を宣言していない interface 宣言に対して呼び出せば null が返る。
+ */
+const tryGetActionTypeDef =
+  (typeChecker: ts.TypeChecker, node: ts.InterfaceDeclaration): ActionTypeDefinition | null => {
+    const name = node.name.getText();
+    const res = name.match(/(.*)Action$/);
+
+    let type: string | null = null;
+    let hasPayload = false;
+
+    if (!res || res.length === 0) return null;
+
+    for (const member of node.members) {
+      const t = typeChecker.getTypeAtLocation(member);
+
+      if (!member.name) continue;
+      if (!ts.isIdentifier(member.name)) continue;
+      const text = member.name.getText();
+
+      if (text === 'type' && t.isStringLiteral()) {
+        type = t.value;
+        continue;
+      }
+
+      if (text === 'payload') {
+        hasPayload = true;
+      }
+    }
+
+    if (!type) return null;
+    return { name: res[1]!, type, hasPayload };
+  };
+
 export const bootstrap = (files: string[]): void => {
   for (const file of files) {
     const program = ts.createProgram([file], {});
     const source = program.getSourceFile(file)!;
     const typeChecker = program.getTypeChecker();
 
-    const tryGetActionTypeDef = (node: ts.InterfaceDeclaration): ActionTypeDefinition | null => {
-      const name = node.name.getText();
-      const res = name.match(/(.*)Action$/);
-
-      let type: string | null = null;
-      let hasPayload = false;
-
-      if (!res || res.length === 0) return null;
-
-      for (const member of node.members) {
-        const t = typeChecker.getTypeAtLocation(member);
-
-        if (!member.name) continue;
-        if (!ts.isIdentifier(member.name)) continue;
-        const text = member.name.getText();
-
-        if (text === 'type' && t.isStringLiteral()) {
-          type = t.value;
-          continue;
-        }
-
-        if (text === 'payload') {
-          hasPayload = true;
-        }
-      }
-
-      if (!type) return null;
-      return { name: res[1]!, type, hasPayload };
-    };
-
     const actionTypeDefs: ActionTypeDefinition[] = []
 
     ts.forEachChild(source, (node) => {
       if (ts.isInterfaceDeclaration(node)) {
-        const actionTypeDef = tryGetActionTypeDef(node);
+        const actionTypeDef = tryGetActionTypeDef(typeChecker, node);
         if (actionTypeDef) actionTypeDefs.push(actionTypeDef);
       }
     });
