@@ -10,12 +10,12 @@
     // "allowJs": true,                        /* javascript ファイルのコンパイルを許可します。 */
     // "checkJs": true,                        /* .js ファイルのエラーを報告します。 */
     // "jsx": "preserve",                      /* JSX コード生成を指定します: 'preserve'、'react-native'、'react'。 */
-    // "declaration": true,                    /* 対応する '.d.ts' ファイルを生成します。 */
+    "declaration": true,                       /* 対応する '.d.ts' ファイルを生成します。 */
     // "declarationMap": true,                 /* 対応する各 '.d.ts' ファイルにソースマップを生成します。 */
     // "sourceMap": true,                      /* 対応する '.map' ファイルを生成します。 */
     // "outFile": "./",                        /* 出力を連結して 1 つのファイルを生成します。 */
-    // "outDir": "./",                         /* ディレクトリへ出力構造をリダイレクトします。 */
-    // "rootDir": "./",                        /* 入力ファイルのルート ディレクトリを指定します。--outDir とともに、出力ディレクトリ構造の制御に使用します。 */
+    "outDir": "./dist",                        /* ディレクトリへ出力構造をリダイレクトします。 */
+    "rootDir": "./src",                        /* 入力ファイルのルート ディレクトリを指定します。--outDir とともに、出力ディレクトリ構造の制御に使用します。 */
     // "composite": true,                      /* プロジェクトのコンパイルを有効にします */
     // "tsBuildInfoFile": "./",                /* 増分コンパイル情報を格納するファイルを指定する */
     // "removeComments": true,                 /* コメントを出力しないでください。 */
@@ -67,5 +67,8 @@
     /* 試験的なオプション */
     // "experimentalDecorators": true,         /* ES7 デコレーター用の実験的なサポートを有効にします。 */
     // "emitDecoratorMetadata": true,          /* デコレーター用の型メタデータを発行するための実験的なサポートを有効にします。 */
-  }
+  },
+  "include": [
+    "src"
+  ]
 }
