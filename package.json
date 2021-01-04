@@ -1,9 +1,15 @@
 {
+  "name": "redux-acc",
+  "description": "Redux Action Creator Creator",
   "private": true,
+  "scripts": {
+    "build": "yarn lerna run build"
+  },
   "workspaces": [
     "packages/*"
   ],
-  "scripts": {
-    "build": "yarn workspaces run build"
+  "devDependencies": {
+    "@octokit/core": "^3.2.4",
+    "lerna": "^3.22.1"
   }
 }

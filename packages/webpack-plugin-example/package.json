@@ -9,7 +9,7 @@
     "build": "webpack"
   },
   "devDependencies": {
-    "@redux-acc/webpack-plugin": "0.1.0",
+    "@redux-acc/webpack-plugin": "^0.1.0",
     "@types/node": "^14.14.17",
     "ts-loader": "^8.0.13",
     "ts-node": "^9.1.1",
