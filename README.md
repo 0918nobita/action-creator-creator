@@ -2,10 +2,22 @@
 
 (WIP) Automatically generate `.ts` files which implement Redux Action Creators
 
+## Install dependencies
+
+```bash
+yarn
+```
+
+## Build
+
+```bash
+yarn build
+```
+
 ## Run
 
 ```bash
-yarn ts-node ./index.ts
+node dist/bin.js example/actions.ts
 ```
 
 ## Example
@@ -13,8 +25,6 @@ yarn ts-node ./index.ts
 Input: (`actions.ts`)
 
 ```typescript
-// @actions
-
 interface FooAction {
   type: 'foo';
   payload: {
