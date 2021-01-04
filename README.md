@@ -17,6 +17,7 @@ yarn build
 ## Run
 
 ```bash
+cd packages/cli
 node dist/bin.js example/actions.ts
 ```
 
