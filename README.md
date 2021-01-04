@@ -2,6 +2,12 @@
 
 (WIP) Automatically generate `.ts` files which implement Redux Action Creators
 
+## Run
+
+```bash
+yarn ts-node ./index.ts
+```
+
 ## Example
 
 Input: (`actions.ts`)
